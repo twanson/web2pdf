@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
-import ContentList from '@/components/content-list'
+import ContentList from './content-list'
 
-export default function Home() {
+const MainContent = () => {
   const [url, setUrl] = useState('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
@@ -42,3 +42,5 @@ export default function Home() {
     </main>
   )
 }
+
+export default MainContent
