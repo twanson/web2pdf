@@ -13,6 +13,9 @@ export default function ContentList({ url }: ContentListProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true)
+        setError('')
+        
         const response = await fetch('/api/list', {
           method: 'POST',
           headers: {
@@ -21,14 +24,16 @@ export default function ContentList({ url }: ContentListProps) {
           body: JSON.stringify({ url }),
         })
         
-        if (!response.ok) {
-          throw new Error('Error al extraer el contenido')
+        const data = await response.json()
+        
+        if (data.error) {
+          throw new Error(data.error)
         }
         
-        const data = await response.json()
-        setItems(data)
-      } catch (err) {
-        setError(err.message)
+        setItems(data.items || [])
+      } catch (err: any) {
+        console.error('Error:', err)
+        setError(err.message || 'Error al extraer el contenido')
       } finally {
         setLoading(false)
       }
@@ -37,15 +42,16 @@ export default function ContentList({ url }: ContentListProps) {
     fetchData()
   }, [url])
 
-  if (loading) return <div>Cargando contenido...</div>
+  if (loading) return <div>Cargando...</div>
   if (error) return <div>Error: {error}</div>
+  if (items.length === 0) return <div>No se encontraron elementos</div>
 
   return (
-    <div className="space-y-4">
+    <div>
       {items.map((item, index) => (
-        <div key={index} className="p-4 border rounded">
-          <h3 className="font-bold">{item.title}</h3>
-          <p>{item.description}</p>
+        <div key={index} className="p-4 border rounded mb-2">
+          <h3>{item.title}</h3>
+          {item.description && <p>{item.description}</p>}
         </div>
       ))}
     </div>
